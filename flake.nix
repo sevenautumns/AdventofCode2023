@@ -32,6 +32,7 @@
             packages = with pkgs; [
               haskellPackages.ghc
               haskell-language-server
+              ormolu
             ];
             commands = (builtins.map
               (name: {
@@ -52,7 +53,14 @@
                 help = "Watch ${capital name}";
                 category = "dev";
               })
-              package_names)
+              package_names) ++ [{
+              name = "format-haskell";
+              command = ''
+                ${pkgs.ormolu}/bin/ormolu --mode inplace *.hs
+              '';
+              help = "format all haskell files";
+              category = "dev";
+            }]
             ;
           });
 
