@@ -20,8 +20,8 @@
             mkdir --parent $out/bin
             ${pkgs.haskellPackages.ghc}/bin/ghc -odir /build -hidir /build -o $out/bin/${name} ${self}/${name}.hs
           '';
-          package_names = map (x: "day" + (toString x)) (lib.range 1 days);
-          days = 2;
+          package_names = (map (x: "day" + (toString x)) (lib.range 1 days)) ++ (map (x: "day" + (toString x) + "-part2") (lib.range 1 days));
+          days = 3;
         in
         rec {
           packages = lib.genAttrs package_names (name: builder name);
@@ -36,14 +36,19 @@
             commands = (builtins.map
               (name: {
                 name = "run-${name}";
-                command = "${packages.${name}}/bin/${name}";
+                command = "nix run .#${name}";
                 help = "Run ${capital name} code";
               })
               package_names)
             ++ (builtins.map
               (name: {
                 name = "watch-${name}";
-                command = "${pkgs.cargo-watch}/bin/cargo-watch watch --watch $PRJ_ROOT/${name}.hs --workdir $PRJ_ROOT --shell \"run-${name}\"";
+                command = ''
+                  ${pkgs.cargo-watch}/bin/cargo-watch watch \
+                    --watch $PRJ_ROOT/${name}.hs \
+                    --workdir $PRJ_ROOT \
+                    --shell "run-${name}"
+                '';
                 help = "Watch ${capital name}";
                 category = "dev";
               })
