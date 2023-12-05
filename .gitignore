@@ -1,9 +1,9 @@
 ### nix ###
 result
+build
 
 ### direnv ###
 .direnv
-.envrc
 
 ### Haskell ###
 dist

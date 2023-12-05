@@ -18,7 +18,7 @@
           capital = text: (lib.strings.toUpper (builtins.substring 0 1 text) + builtins.substring 1 100 text);
           builder = name: pkgs.runCommand name { } ''
             mkdir --parent $out/bin
-            ${pkgs.haskellPackages.ghc}/bin/ghc -odir /build -hidir /build -o $out/bin/${name} ${self}/${name}.hs
+            ${pkgs.haskellPackages.ghc}/bin/ghc -O2 -odir /build -hidir /build -o $out/bin/${name} ${self}/${name}.hs
           '';
           package_names = (map (x: "day" + (toString x)) (lib.range 1 days)) ++ (map (x: "day" + (toString x) + "-part2") (lib.range 1 days));
           days = 4;
@@ -33,6 +33,7 @@
               haskellPackages.ghc
               haskell-language-server
               ormolu
+              cocogitto
             ];
             commands = (builtins.map
               (name: {
@@ -45,10 +46,10 @@
               (name: {
                 name = "watch-${name}";
                 command = ''
+                  mkdir --parent $PRJ_ROOT/build
                   ${pkgs.cargo-watch}/bin/cargo-watch watch \
-                    --watch $PRJ_ROOT/${name}.hs \
                     --workdir $PRJ_ROOT \
-                    --shell "run-${name}"
+                    --shell "${pkgs.ghc}/bin/ghc -O2 -odir $PRJ_ROOT/build -hidir $PRJ_ROOT/build -o $PRJ_ROOT/build/${name} $PRJ_ROOT/${name}.hs && $PRJ_ROOT/build/${name}"
                 '';
                 help = "Watch ${capital name}";
                 category = "dev";
