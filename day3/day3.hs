@@ -5,9 +5,9 @@ type Coordinate = (Int, Char)
 
 containsSymbolInRange :: [String] -> (Int, Int) -> Bool
 containsSymbolInRange [] _ = False
-containsSymbolInRange (x : xs) (min, max) = do
+containsSymbolInRange (x : xs) (min, max) =
   let slice = take (max - min + 1) (drop min x)
-  any (\x -> not $ isDigit x && x /= '.') slice || containsSymbolInRange xs (min, max)
+   in any (\x -> x /= '.' && (not . isDigit) x) slice || containsSymbolInRange xs (min, max)
 
 containsSymbol :: [Coordinate] -> Bool
 containsSymbol = foldr (\(_, x) -> (||) (x /= '.' && not (isDigit x))) False
@@ -40,9 +40,9 @@ scanLines input@(line1 : line2 : line3 : _) = scanLine line2 [line1, line2, line
 scanLines _ = []
 
 findPartNumbers :: [String] -> [Int]
-findPartNumbers input = scanLines $ [empty] ++ input ++ [empty]
-  where
-    empty = replicate (length $ head input) '.'
+findPartNumbers input =
+  let empty = replicate (length $ head input) '.'
+   in scanLines $ [empty] ++ input ++ [empty]
 
 main :: IO ()
 main = readFile "day3-input" >>= print . sum . findPartNumbers . lines
