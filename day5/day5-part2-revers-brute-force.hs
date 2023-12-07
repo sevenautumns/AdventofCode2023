@@ -2,10 +2,10 @@ import Data.Char (isDigit)
 import Data.List (groupBy)
 
 inRange :: [Int] -> Int -> Bool
-inRange (_ : x : y : _) input = diff < y && diff >= 0 where diff = input - x
+inRange (x : _ : y : _) input = diff < y && diff >= 0 where diff = input - x
 
 getOutput :: [Int] -> Int -> Int
-getOutput (x : y : _) input = (input - y) + x
+getOutput (x : y : _) input = (input - x) + y
 
 applyMap :: Int -> [[Int]] -> Int
 applyMap i [] = i
@@ -13,8 +13,8 @@ applyMap input (x : xs)
   | inRange x input = getOutput x input
   | otherwise = applyMap input xs
 
-applyMapsHelper :: [Int] -> [[[Int]]] -> [Int]
-applyMapsHelper xs maps = map (\x -> foldl applyMap x maps) xs
+applyMaps :: Int -> [[[Int]]] -> Int
+applyMaps = foldl applyMap
 
 parseNumbers :: String -> [Int]
 parseNumbers input = parseNumbersHelper input ""
@@ -33,19 +33,38 @@ pruneNonNumberGroups (x : xs)
   | not $ containsNumber $ head x = pruneNonNumberGroups xs
   | otherwise = x : pruneNonNumberGroups xs
 
+parseSeeds :: [Int] -> [Int]
+parseSeeds [] = []
+parseSeeds (x : y : xs) = enumFromTo x (x + y) ++ parseSeeds xs
+
+inSeeds :: Int -> [Int] -> Bool
+inSeeds _ [] = False
+inSeeds i (x : y : xs)
+  | diff < y && diff >= 0 = True
+  | otherwise = inSeeds i xs
+  where
+    diff = i - x
+
 containsNumber :: String -> Bool
 containsNumber [] = False
 containsNumber (x : xs)
   | isDigit x = True
   | otherwise = containsNumber xs
 
-applyMaps :: [String] -> [Int]
-applyMaps input = do
+findFirstHit :: [String] -> Int
+findFirstHit input = do
   let grouped = groupBy (\a b -> containsNumber a && containsNumber b) input
   let pruned = pruneNonNumberGroups grouped
-  let maps = map (map parseNumbers) (tail pruned)
   let seeds = parseNumbers $ head $ head pruned
-  applyMapsHelper seeds maps
+  let maps = reverse (map (map parseNumbers) (tail pruned))
+  findFirstHitHelper 0 seeds maps
+
+findFirstHitHelper :: Int -> [Int] -> [[[Int]]] -> Int
+findFirstHitHelper i seeds maps
+  | inSeeds res seeds = i
+  | otherwise = findFirstHitHelper (i + 1) seeds maps
+  where
+    res = applyMaps i maps
 
 main :: IO ()
-main = readFile "day5-input" >>= print . minimum . applyMaps . lines
+main = readFile "day5-input" >>= print . findFirstHit . lines

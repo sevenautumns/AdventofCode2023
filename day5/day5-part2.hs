@@ -1,20 +1,30 @@
 import Data.Char (isDigit)
 import Data.List (groupBy)
 
-inRange :: [Int] -> Int -> Bool
-inRange (x : _ : y : _) input = diff < y && diff >= 0 where diff = input - x
+type Range = (Int, Int)
 
-getOutput :: [Int] -> Int -> Int
-getOutput (x : y : _) input = (input - x) + y
+addToRange :: Range -> Int -> Range
+addToRange (x, y) i = (x + i, y + i)
 
-applyMap :: Int -> [[Int]] -> Int
-applyMap i [] = i
+applyRule :: [Int] -> Range -> ([Range], [Range])
+applyRule (dest : start : delta : _) input
+  | snd input < start || fst input > start + delta - 1 = ([input], [])
+  | fst input >= start && snd input <= start + delta - 1 = ([], [addToRange input (dest - start)])
+  | fst input < start && snd input > start + delta - 1 = ([(fst input, start - 1), (start + delta, snd input)], [(dest, dest + delta - 1)])
+  | fst input < start = ([(fst input, start - 1)], [addToRange (start, snd input) (dest - start)])
+  | snd input > start + delta - 1 = ([(start + delta, snd input)], [addToRange (fst input, start + delta - 1) (dest - start)])
+
+applyMap :: Range -> [[Int]] -> [Range]
+applyMap input [] = [input]
 applyMap input (x : xs)
-  | inRange x input = getOutput x input
-  | otherwise = applyMap input xs
+  | length rest == 2 = hits ++ applyMap (head rest) xs ++ applyMap (last rest) xs
+  | length rest == 1 = hits ++ applyMap (head rest) xs
+  | otherwise = hits
+  where
+    (rest, hits) = applyRule x input
 
-applyMaps :: Int -> [[[Int]]] -> Int
-applyMaps = foldl applyMap
+applyMaps :: [Range] -> [[[Int]]] -> [Range]
+applyMaps = foldl (\ranges maps -> concatMap (`applyMap` maps) ranges)
 
 parseNumbers :: String -> [Int]
 parseNumbers input = parseNumbersHelper input ""
@@ -33,17 +43,9 @@ pruneNonNumberGroups (x : xs)
   | not $ containsNumber $ head x = pruneNonNumberGroups xs
   | otherwise = x : pruneNonNumberGroups xs
 
-parseSeeds :: [Int] -> [Int]
+parseSeeds :: [Int] -> [Range]
 parseSeeds [] = []
-parseSeeds (x : y : xs) = enumFromTo x (x + y) ++ parseSeeds xs
-
-inSeeds :: Int -> [Int] -> Bool
-inSeeds _ [] = False
-inSeeds i (x : y : xs)
-  | diff < y && diff >= 0 = True
-  | otherwise = inSeeds i xs
-  where
-    diff = i - x
+parseSeeds (x : y : xs) = (x, x + y - 1) : parseSeeds xs
 
 containsNumber :: String -> Bool
 containsNumber [] = False
@@ -51,22 +53,13 @@ containsNumber (x : xs)
   | isDigit x = True
   | otherwise = containsNumber xs
 
-findFirstHit :: [String] -> Int
-findFirstHit input = do
+findFirstSeed :: [String] -> Int
+findFirstSeed input = do
   let grouped = groupBy (\a b -> containsNumber a && containsNumber b) input
   let pruned = pruneNonNumberGroups grouped
-  let seeds = parseNumbers $ head $ head pruned
-  let maps = reverse (map (map parseNumbers) (tail pruned))
-  findFirstHitHelper 0 seeds maps
-
-findFirstHitHelper :: Int -> [Int] -> [[[Int]]] -> Int
-findFirstHitHelper i seeds maps
-  | inSeeds res seeds = i
-  | otherwise = findFirstHitHelper (i + 1) seeds maps
-  where
-    res = applyMaps i maps
+  let seeds = parseSeeds $ parseNumbers $ head $ head pruned
+  let maps = map (map parseNumbers) (tail pruned)
+  minimum $ map fst (applyMaps seeds maps)
 
 main :: IO ()
-main = do
-  input <- readFile "day5-input"
-  print $ findFirstHit $ lines input
+main = readFile "day5-input" >>= print . findFirstSeed . lines
