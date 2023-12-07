@@ -14,9 +14,9 @@ patchLine str@('n' : 'i' : 'n' : 'e' : _) = "9" ++ patchLine (tail str)
 patchLine (x : xs) = x : patchLine xs
 
 getNumber :: String -> Int
-getNumber input = do
+getNumber input =
   let numbers = filter isDigit (patchLine input)
-  read [head numbers, last numbers] :: Int
+   in read [head numbers, last numbers]
 
 decrypt :: [String] -> Int
 decrypt = foldr ((+) . getNumber) 0

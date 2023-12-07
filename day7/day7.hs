@@ -6,7 +6,7 @@ splitOnSpace :: String -> (String, String)
 splitOnSpace str = let (a, b) = break isSpace str in (a, drop 1 b)
 
 countCards :: String -> [Int]
-countCards input = sortBy (comparing Down) (map length $ (group . sort) input)
+countCards = sortBy (comparing Down) . map length . group . sort
 
 powerLevel :: [Int] -> Int
 powerLevel (5 : _) = 6

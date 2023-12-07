@@ -50,9 +50,9 @@ windowScanLines input@(line1 : line2 : line3 : _) = scanCurrentLine line2 [line1
 windowScanLines _ = []
 
 findPartNumbers :: [String] -> [Int]
-findPartNumbers input = windowScanLines $ [empty] ++ input ++ [empty]
-  where
-    empty = replicate (length $ head input) '.'
+findPartNumbers input =
+  let empty = replicate (length $ head input) '.'
+   in windowScanLines $ [empty] ++ input ++ [empty]
 
 main :: IO ()
 main = readFile "day3-input" >>= print . sum . findPartNumbers . lines

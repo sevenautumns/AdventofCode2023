@@ -5,7 +5,7 @@ splitOnFirst :: Char -> String -> (String, String)
 splitOnFirst sep str = let (a, b) = break (== sep) str in (a, drop 1 b)
 
 intersect :: [Int] -> [Int] -> [Int]
-intersect left right = [x | x <- left, x `elem` right]
+intersect left = filter (`elem` left)
 
 filterNumbers :: String -> [Int]
 filterNumbers = map read . words

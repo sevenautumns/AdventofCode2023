@@ -17,15 +17,15 @@ applyMapsHelper :: [Int] -> [[[Int]]] -> [Int]
 applyMapsHelper xs maps = map (\x -> foldl applyMap x maps) xs
 
 parseNumbers :: String -> [Int]
-parseNumbers input = parseNumbersHelper input ""
+parseNumbers = parseNumbersHelper ""
 
 parseNumbersHelper :: String -> String -> [Int]
 parseNumbersHelper [] [] = []
-parseNumbersHelper [] x = [read x]
-parseNumbersHelper (x : xs) y
-  | isDigit x = parseNumbersHelper xs (y ++ [x])
-  | not (null y) = read y : parseNumbersHelper xs ""
-  | otherwise = parseNumbersHelper xs ""
+parseNumbersHelper x [] = [read x]
+parseNumbersHelper x (y : ys)
+  | isDigit y = parseNumbersHelper (x ++ [y]) ys
+  | not (null x) = read x : parseNumbersHelper "" ys
+  | otherwise = parseNumbersHelper "" ys
 
 pruneNonNumberGroups :: [[String]] -> [[String]]
 pruneNonNumberGroups [] = []
@@ -34,10 +34,7 @@ pruneNonNumberGroups (x : xs)
   | otherwise = x : pruneNonNumberGroups xs
 
 containsNumber :: String -> Bool
-containsNumber [] = False
-containsNumber (x : xs)
-  | isDigit x = True
-  | otherwise = containsNumber xs
+containsNumber = foldr ((||) . isDigit) False
 
 applyMaps :: [String] -> [Int]
 applyMaps input = do

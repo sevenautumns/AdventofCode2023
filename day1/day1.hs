@@ -1,9 +1,9 @@
 import Data.Char (isDigit)
 
 getNumber :: String -> Int
-getNumber input = do
+getNumber input =
   let numbers = filter isDigit input
-  read [head numbers, last numbers] :: Int
+   in read [head numbers, last numbers]
 
 decrypt :: [String] -> Int
 decrypt = foldr ((+) . getNumber) 0

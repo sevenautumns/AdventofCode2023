@@ -14,9 +14,9 @@ isValidPick input = do
 
 validateGame :: String -> Bool
 validateGame [] = True
-validateGame input = do
+validateGame input =
   let (x, xs) = splitOnFirst [',', ';'] input
-  isValidPick (filter (not . isSpace) x) && validateGame xs
+   in isValidPick (filter (not . isSpace) x) && validateGame xs
 
 validateGames :: [String] -> Int
 validateGames [] = 0

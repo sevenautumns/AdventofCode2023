@@ -27,15 +27,15 @@ applyMaps :: [Range] -> [[[Int]]] -> [Range]
 applyMaps = foldl (\ranges maps -> concatMap (`applyMap` maps) ranges)
 
 parseNumbers :: String -> [Int]
-parseNumbers input = parseNumbersHelper input ""
+parseNumbers = parseNumbersHelper ""
 
 parseNumbersHelper :: String -> String -> [Int]
 parseNumbersHelper [] [] = []
-parseNumbersHelper [] x = [read x]
-parseNumbersHelper (x : xs) y
-  | isDigit x = parseNumbersHelper xs (y ++ [x])
-  | not (null y) = read y : parseNumbersHelper xs ""
-  | otherwise = parseNumbersHelper xs ""
+parseNumbersHelper x [] = [read x]
+parseNumbersHelper x (y : ys)
+  | isDigit y = parseNumbersHelper (x ++ [y]) ys
+  | not (null x) = read x : parseNumbersHelper "" ys
+  | otherwise = parseNumbersHelper "" ys
 
 pruneNonNumberGroups :: [[String]] -> [[String]]
 pruneNonNumberGroups [] = []
@@ -48,10 +48,7 @@ parseSeeds [] = []
 parseSeeds (x : y : xs) = (x, x + y - 1) : parseSeeds xs
 
 containsNumber :: String -> Bool
-containsNumber [] = False
-containsNumber (x : xs)
-  | isDigit x = True
-  | otherwise = containsNumber xs
+containsNumber = foldr ((||) . isDigit) False
 
 findFirstSeed :: [String] -> Int
 findFirstSeed input = do

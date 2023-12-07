@@ -10,16 +10,11 @@ findLongestPress time = findPressHelper time (-1) time
 
 findPressHelper :: Int -> Int -> Int -> Int -> Int
 findPressHelper press delta time distance
-  | dist > distance = press
+  | (time - press) * press > distance = press
   | otherwise = findPressHelper (press + delta) delta time distance
-  where
-    dist = (time - press) * press
 
 getWins :: Int -> Int -> Int
-getWins time distance = max - min + 1
-  where
-    min = findShortestPress time distance
-    max = findLongestPress time distance
+getWins time distance = findLongestPress time distance - findShortestPress time distance + 1
 
 countWins :: [Int] -> [Int] -> Int
 countWins [] [] = 1
@@ -29,15 +24,15 @@ calculateMargin :: [[Int]] -> Int
 calculateMargin (x : y : _) = countWins x y
 
 parseNumbers :: String -> [Int]
-parseNumbers input = parseNumbersHelper input ""
+parseNumbers = parseNumbersHelper ""
 
 parseNumbersHelper :: String -> String -> [Int]
 parseNumbersHelper [] [] = []
-parseNumbersHelper [] x = [read x]
-parseNumbersHelper (x : xs) y
-  | isDigit x = parseNumbersHelper xs (y ++ [x])
-  | not (null y) = read y : parseNumbersHelper xs ""
-  | otherwise = parseNumbersHelper xs ""
+parseNumbersHelper x [] = [read x]
+parseNumbersHelper x (y : ys)
+  | isDigit y = parseNumbersHelper (x ++ [y]) ys
+  | not (null x) = read x : parseNumbersHelper "" ys
+  | otherwise = parseNumbersHelper "" ys
 
 main :: IO ()
 main = readFile "day6-input" >>= print . calculateMargin . map parseNumbers . lines
