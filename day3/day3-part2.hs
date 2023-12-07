@@ -55,6 +55,4 @@ findPartNumbers input = windowScanLines $ [empty] ++ input ++ [empty]
     empty = replicate (length $ head input) '.'
 
 main :: IO ()
-main = do
-  input <- readFile "day3-input"
-  print $ sum $ findPartNumbers $ lines input
+main = readFile "day3-input" >>= print . sum . findPartNumbers . lines

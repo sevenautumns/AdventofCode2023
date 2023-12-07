@@ -30,6 +30,4 @@ validateGames (x : xs) = do
   validateGames xs + (r * g * b)
 
 main :: IO ()
-main = do
-  input <- readFile "day2-input"
-  print $ validateGames $ lines input
+main = readFile "day2-input" >>= print . validateGames . lines

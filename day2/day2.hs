@@ -28,6 +28,4 @@ validateGames (x : xs) = do
 allowed = [(12, "red"), (13, "green"), (14, "blue")]
 
 main :: IO ()
-main = do
-  input <- readFile "day2-input"
-  print $ validateGames $ lines input
+main = readFile "day2-input" >>= print . validateGames . lines

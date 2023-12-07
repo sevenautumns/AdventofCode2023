@@ -28,6 +28,4 @@ solveGames :: [String] -> Int
 solveGames input = sum $ map solveGame input
 
 main :: IO ()
-main = do
-  input <- readFile "day4-input"
-  print $ solveGames $ lines input
+main = readFile "day4-input" >>= print . solveGames . lines

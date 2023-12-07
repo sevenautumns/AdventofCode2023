@@ -42,6 +42,4 @@ solveGames input = do
   walkGames input counts
 
 main :: IO ()
-main = do
-  input <- readFile "day4-input"
-  print $ solveGames $ lines input
+main = readFile "day4-input" >>= print . solveGames . lines

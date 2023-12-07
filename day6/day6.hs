@@ -40,6 +40,4 @@ parseNumbersHelper (x : xs) y
   | otherwise = parseNumbersHelper xs ""
 
 main :: IO ()
-main = do
-  input <- readFile "day6-input"
-  print $ calculateMargin $ map parseNumbers (lines input)
+main = readFile "day6-input" >>= print . calculateMargin . map parseNumbers . lines

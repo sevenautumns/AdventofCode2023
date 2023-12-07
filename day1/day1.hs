@@ -9,6 +9,4 @@ decrypt :: [String] -> Int
 decrypt = foldr ((+) . getNumber) 0
 
 main :: IO ()
-main = do
-  input <- readFile "day1-input"
-  print $ decrypt $ lines input
+main = readFile "day1-input" >>= print . decrypt . lines
