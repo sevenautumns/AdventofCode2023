@@ -20,12 +20,12 @@ parseMaps :: [String] -> Maps
 parseMaps = Map.fromList . map parseMap
 
 parse :: [String] -> (Instructions, Maps)
-parse (inst : _ : maps) = (inst, parseMaps maps)
+parse (inst : _ : maps) = (cycle inst, parseMaps maps)
 
 advanceTillGoal :: Node -> Int -> Instructions -> Maps -> Int
 advanceTillGoal "ZZZ" n _ _ = n
-advanceTillGoal pos n ('L' : rest) maps = let node = fst $ maps Map.! pos in advanceTillGoal node (n + 1) (rest ++ ['L']) maps
-advanceTillGoal pos n ('R' : rest) maps = let node = snd $ maps Map.! pos in advanceTillGoal node (n + 1) (rest ++ ['R']) maps
+advanceTillGoal pos n ('L' : rest) maps = let node = fst $ maps Map.! pos in advanceTillGoal node (n + 1) rest maps
+advanceTillGoal pos n ('R' : rest) maps = let node = snd $ maps Map.! pos in advanceTillGoal node (n + 1) rest maps
 
 stepsTillGoal :: [String] -> Int
 stepsTillGoal input = let (instructions, maps) = parse input in advanceTillGoal "AAA" 0 instructions maps

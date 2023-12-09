@@ -22,7 +22,7 @@ parseMaps :: [String] -> Maps
 parseMaps = Map.fromList . map parseMap
 
 parse :: [String] -> (Instructions, Maps)
-parse (inst : _ : maps) = (inst, parseMaps maps)
+parse (inst : _ : maps) = (cycle inst, parseMaps maps)
 
 advance :: Node -> Instruction -> Maps -> Node
 advance pos 'L' maps = fst $ maps Map.! pos
@@ -31,7 +31,7 @@ advance pos 'R' maps = snd $ maps Map.! pos
 advanceTillGoal :: Node -> Int -> Instructions -> Maps -> Int
 advanceTillGoal pos n (i : rest) maps
   | 'Z' `elem` pos = n
-  | otherwise = advanceTillGoal (advance pos i maps) (n + 1) (rest ++ [i]) maps
+  | otherwise = advanceTillGoal (advance pos i maps) (n + 1) rest maps
 
 findStarts :: Maps -> [Node]
 findStarts = filter (elem 'A') . map fst . Map.toList
