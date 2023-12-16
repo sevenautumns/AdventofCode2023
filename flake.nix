@@ -22,7 +22,7 @@
             ${pkgs.haskellPackages.ghc}/bin/ghc -O2 -odir /build -hidir /build -o $out/bin/${name} ${self}/${basename name}/${name}.hs
           '';
           package_names = (map (x: "day" + (toString x)) (lib.range 1 days)) ++ (map (x: "day" + (toString x) + "-part2") (lib.range 1 days));
-          days = 15;
+          days = 16;
         in
         rec {
           packages = lib.genAttrs package_names (name: builder name);
